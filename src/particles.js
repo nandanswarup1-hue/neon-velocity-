@@ -3,6 +3,23 @@
 export class ParticleSystem {
   constructor() {
     this.particles = [];
+    this.warpLines = [];
+  }
+
+  // Warp speed lines radiating from horizon at high velocity
+  emitWarpLine(width, height, horizonY) {
+    const angle = Math.random() * Math.PI + Math.PI; // radiate downward / outward
+    const speed = Math.random() * 15 + 10;
+    const originX = width / 2 + (Math.random() - 0.5) * (width * 0.4);
+    this.warpLines.push({
+      x: originX,
+      y: horizonY + 5,
+      vx: Math.cos(angle) * speed * 1.5,
+      vy: Math.sin(angle) * speed * 2 + 8,
+      length: Math.random() * 25 + 15,
+      alpha: 1,
+      decay: 0.05
+    });
   }
 
   // Neon explosion on crash or barricade shatter
@@ -71,10 +88,33 @@ export class ParticleSystem {
         this.particles.splice(i, 1);
       }
     }
+
+    for (let i = this.warpLines.length - 1; i >= 0; i--) {
+      const w = this.warpLines[i];
+      w.x += w.vx;
+      w.y += w.vy;
+      w.alpha -= w.decay;
+      if (w.alpha <= 0) {
+        this.warpLines.splice(i, 1);
+      }
+    }
   }
 
   draw(ctx) {
     ctx.save();
+    // Render warp lines first
+    for (const w of this.warpLines) {
+      ctx.globalAlpha = Math.max(0, w.alpha * 0.7);
+      ctx.strokeStyle = '#00f0ff';
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = '#00f0ff';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(w.x, w.y);
+      ctx.lineTo(w.x - w.vx * 1.5, w.y - w.vy * 1.5);
+      ctx.stroke();
+    }
+
     for (const p of this.particles) {
       ctx.globalAlpha = Math.max(0, p.alpha);
       if (p.glow) {
@@ -91,5 +131,6 @@ export class ParticleSystem {
 
   clear() {
     this.particles = [];
+    this.warpLines = [];
   }
 }
