@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Neon Velocity | Cyber Grid Arcade Runner</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body>
+
+  <!-- Game Canvas -->
+  <canvas id="gameCanvas"></canvas>
+  <div class="scanlines"></div>
+
+  <!-- In-Game HUD -->
+  <header id="hud">
+    <div class="hud-item">
+      <span class="hud-label">Score</span>
+      <span class="hud-value" id="hudScore">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">Velocity</span>
+      <span class="hud-value" id="hudSpeed">108 KM/H</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">Combo</span>
+      <span class="hud-value" id="hudCombo">x1</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">Status</span>
+      <span class="hud-value" id="hudShield" style="font-size: 16px;">SHIELD: OFF</span>
+    </div>
+    <div class="hud-actions">
+      <button class="icon-btn" id="muteBtn" title="Toggle Audio">🔊</button>
+    </div>
+  </header>
+
+  <!-- Start Screen -->
+  <div class="screen" id="menuScreen">
+    <div class="screen-card">
+      <h1 class="title-glitch">NEON VELOCITY</h1>
+      <p class="subtitle">Cyber Grid Arcade Runner</p>
+
+      <div class="instructions">
+        🎮 <span>Controls:</span> A / D or ◄ / ► to shift lanes<br>
+        💎 <span>Collect Orbs:</span> Build high-score combos<br>
+        🛡️ <span>Shields:</span> Absorb 1 barrier collision<br>
+        ⚡ <span>Overdrive:</span> Invincible hypersonic turbo<br>
+        📱 <span>Mobile:</span> Swipe left/right or use on-screen buttons
+      </div>
+
+      <button class="neon-btn" id="startBtn">LAUNCH ENGINE</button>
+    </div>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div class="screen hidden" id="gameOverScreen">
+    <div class="screen-card">
+      <h1 class="title-glitch" style="color: #ff0055; text-shadow: 0 0 20px #ff0055;">SYSTEM CRITICAL</h1>
+      <p class="subtitle">Craft Destroyed</p>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-label">FINAL SCORE</div>
+          <div class="stat-num" id="finalScore">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">RECORD</div>
+          <div class="stat-num" id="highScore" style="color: #00f0ff; text-shadow: 0 0 10px #00f0ff;">0</div>
+        </div>
+      </div>
+
+      <button class="neon-btn" id="restartBtn">RE-ENGAGE SYSTEM</button>
+    </div>
+  </div>
+
+  <!-- Mobile Touch Controls -->
+  <div class="mobile-controls">
+    <button class="ctrl-btn" id="mobileLeft">◀</button>
+    <button class="ctrl-btn" id="mobileRight">▶</button>
+  </div>
+
+  <!-- Game Logic -->
+  <script type="module" src="./src/game.js"></script>
+</body>
+</html>
