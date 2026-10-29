@@ -32,9 +32,13 @@
       <span class="hud-value" id="hudShield" style="font-size: 16px;">SHIELD: OFF</span>
     </div>
     <div class="hud-actions">
+      <button class="icon-btn" id="pauseBtn" title="Pause Game">⏸</button>
       <button class="icon-btn" id="muteBtn" title="Toggle Audio">🔊</button>
     </div>
   </header>
+
+  <!-- In-game Notification Banner -->
+  <div id="hudBanner" class="hud-banner hidden"></div>
 
   <!-- Start Screen -->
   <div class="screen" id="menuScreen">
@@ -51,6 +55,15 @@
       </div>
 
       <button class="neon-btn" id="startBtn">LAUNCH ENGINE</button>
+    </div>
+  </div>
+
+  <!-- Pause Screen -->
+  <div class="screen hidden" id="pauseScreen">
+    <div class="screen-card">
+      <h1 class="title-glitch" style="color: #00f0ff;">SYSTEM PAUSED</h1>
+      <p class="subtitle">Engines idling</p>
+      <button class="neon-btn" id="resumeBtn">RESUME VELOCITY</button>
     </div>
   </div>
 

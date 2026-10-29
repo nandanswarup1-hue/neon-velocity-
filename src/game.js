@@ -52,16 +52,30 @@ class NeonVelocityGame {
     this.hudSpeed = document.getElementById('hudSpeed');
     this.hudCombo = document.getElementById('hudCombo');
     this.hudShield = document.getElementById('hudShield');
+    this.hudBanner = document.getElementById('hudBanner');
     this.menuScreen = document.getElementById('menuScreen');
+    this.pauseScreen = document.getElementById('pauseScreen');
     this.gameOverScreen = document.getElementById('gameOverScreen');
     this.finalScoreEl = document.getElementById('finalScore');
     this.highScoreEl = document.getElementById('highScore');
     this.muteBtn = document.getElementById('muteBtn');
+    this.pauseBtn = document.getElementById('pauseBtn');
+    this.bannerTimer = null;
+    this.speedMilestoneAnnounced = false;
 
     this.muteBtn.addEventListener('click', () => {
       const isMuted = sound.toggleMute();
       this.muteBtn.textContent = isMuted ? '🔇' : '🔊';
     });
+
+    if (this.pauseBtn) {
+      this.pauseBtn.addEventListener('click', () => this.togglePause());
+    }
+
+    const resumeBtn = document.getElementById('resumeBtn');
+    if (resumeBtn) {
+      resumeBtn.addEventListener('click', () => this.togglePause());
+    }
 
     document.getElementById('startBtn').addEventListener('click', () => this.startGame());
     document.getElementById('restartBtn').addEventListener('click', () => this.startGame());
@@ -153,9 +167,28 @@ class NeonVelocityGame {
   togglePause() {
     if (this.state === 'PLAYING') {
       this.state = 'PAUSED';
+      if (this.pauseScreen) this.pauseScreen.classList.remove('hidden');
+      if (this.pauseBtn) this.pauseBtn.textContent = '▶';
     } else if (this.state === 'PAUSED') {
       this.state = 'PLAYING';
+      if (this.pauseScreen) this.pauseScreen.classList.add('hidden');
+      if (this.pauseBtn) this.pauseBtn.textContent = '⏸';
     }
+  }
+
+  showBanner(text, duration = 1800, color = '#ffea00') {
+    if (!this.hudBanner) return;
+    if (this.bannerTimer) clearTimeout(this.bannerTimer);
+
+    this.hudBanner.textContent = text;
+    this.hudBanner.style.borderColor = color;
+    this.hudBanner.style.color = color;
+    this.hudBanner.style.boxShadow = `0 0 25px ${color}`;
+    this.hudBanner.classList.remove('hidden');
+
+    this.bannerTimer = setTimeout(() => {
+      this.hudBanner.classList.add('hidden');
+    }, duration);
   }
 
   startGame() {
@@ -172,11 +205,15 @@ class NeonVelocityGame {
     this.updatePlayerLanePosition(true);
     this.shieldActive = false;
     this.overdriveTimer = 0;
+    this.speedMilestoneAnnounced = false;
     this.entities = [];
     this.particles.clear();
 
     this.menuScreen.classList.add('hidden');
     this.gameOverScreen.classList.add('hidden');
+    if (this.pauseScreen) this.pauseScreen.classList.add('hidden');
+    if (this.pauseBtn) this.pauseBtn.textContent = '⏸';
+    this.showBanner('⚡ VELOCITY INITIATED', 1500, '#00f0ff');
   }
 
   gameOver() {
@@ -265,6 +302,15 @@ class NeonVelocityGame {
     // Thruster trail emitter
     this.particles.emitTrail(this.playerX, this.playerY + 12, isOverdrive);
 
+    // Emit warp speed lines during high velocity or overdrive
+    if (isOverdrive || this.speed > 22) {
+      this.particles.emitWarpLine(this.canvas.width, this.canvas.height, this.horizonY);
+      if (this.speed * 9 >= 240 && !this.speedMilestoneAnnounced) {
+        this.speedMilestoneAnnounced = true;
+        this.showBanner('🚀 MACH VELOCITY REACHED!', 2000, '#00f0ff');
+      }
+    }
+
     // Combo countdown
     if (this.comboTimer > 0) {
       this.comboTimer -= delta;
@@ -301,21 +347,27 @@ class NeonVelocityGame {
 
         if (distToPlayer < 40) {
           if (e.type === 'ORB') {
+            const prevCombo = this.combo;
             this.combo = Math.min(5, this.combo + 1);
             this.comboTimer = 2200; // 2.2 seconds to maintain combo
             this.score += 150 * this.combo;
+            if (this.combo === 5 && prevCombo < 5) {
+              this.showBanner('🔥 HYPER COMBO x5!', 1800, '#ff0055');
+            }
             sound.playCollect(this.combo);
             this.particles.burst(p.x, p.y, e.color, 14);
             this.entities.splice(i, 1);
             continue;
           } else if (e.type === 'SHIELD') {
             this.shieldActive = true;
+            this.showBanner('🛡️ SHIELD EQUIPPED!', 1800, '#a855f7');
             sound.playPowerup();
             this.particles.burst(p.x, p.y, e.color, 24);
             this.entities.splice(i, 1);
             continue;
           } else if (e.type === 'OVERDRIVE') {
             this.overdriveTimer = 4000; // 4 seconds of overdrive
+            this.showBanner('⚡ OVERDRIVE ENGAGED!', 2200, '#ffea00');
             sound.playPowerup();
             this.particles.burst(p.x, p.y, e.color, 28);
             this.entities.splice(i, 1);
@@ -331,6 +383,7 @@ class NeonVelocityGame {
             } else if (this.shieldActive) {
               // Shield absorbs crash
               this.shieldActive = false;
+              this.showBanner('🛡️ SHIELD DEFLECTED!', 1500, '#00f0ff');
               sound.playShieldBreak();
               this.shakeAmount = 14;
               this.particles.explode(p.x, p.y, '#a855f7', 20);

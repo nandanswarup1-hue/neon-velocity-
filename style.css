@@ -274,3 +274,41 @@ body {
     display: none;
   }
 }
+
+/* HUD Alert Banner */
+.hud-banner {
+  position: absolute;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(14, 18, 36, 0.9);
+  border: 1px solid #ffea00;
+  box-shadow: 0 0 25px rgba(255, 234, 0, 0.6), inset 0 0 10px rgba(255, 234, 0, 0.3);
+  color: #ffea00;
+  font-family: 'Orbitron', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 8px 24px;
+  border-radius: 20px;
+  z-index: 25;
+  pointer-events: none;
+  text-transform: uppercase;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: bannerPulse 1.2s infinite alternate;
+}
+
+.hud-banner.hidden {
+  opacity: 0;
+  transform: translateX(-50%) scale(0.8);
+}
+
+@keyframes bannerPulse {
+  0% {
+    box-shadow: 0 0 15px rgba(255, 234, 0, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 30px rgba(255, 234, 0, 0.9);
+  }
+}
+
